@@ -5,8 +5,8 @@ scrape_configs:
   - job_name: 'producto-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['192.168.1.247:8083']
+      - targets: ['producto-service:8083']
   - job_name: 'orden-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['192.168.1.247:8084']
+      - targets: ['orden-service:8084']

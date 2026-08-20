@@ -1,0 +1,76 @@
+version: '3.8'
+services:
+  eureka-api-gateway:
+    build:
+      context: .
+      dockerfile: eureka-api-gateway/Dockerfile
+      args:
+        SERVICE_NAME: eureka-api-gateway
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx834m
+    mem_limit: 512m
+    cpus: 0.25
+    networks:
+      - sbnet
+  servidor-config:
+    build:
+      context: .
+      dockerfile: servidor-config/Dockerfile
+      args:
+        SERVICE_NAME: servidor-config
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx834m
+    mem_limit: 512m
+    cpus: 0.25
+    networks:
+      - sbnet
+  producto-service:
+    build:
+      context: .
+      dockerfile: producto-service/Dockerfile
+      args:
+        SERVICE_NAME: producto-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx834m
+    mem_limit: 512m
+    cpus: 0.25
+    depends_on:
+      - eureka-api-gateway
+      - servidor-config
+    volumes:
+      - /home/rusok/Descargas/MonitoreoObservabilidad/Ejemplo2/logs_producto:/app/logs_producto
+    networks:
+      - sbnet
+  orden-service:
+    build:
+      context: .
+      dockerfile: orden-service/Dockerfile
+      args:
+        SERVICE_NAME: orden-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx834m
+    mem_limit: 512m
+    cpus: 0.25
+    depends_on:
+      - eureka-api-gateway
+      - servidor-config
+      - producto-service
+    volumes:
+      - /home/rusok/Descargas/MonitoreoObservabilidad/Ejemplo2/logs_orden:/app/logs_orden
+    networks:
+      - sbnet
+networks:
+  sbnet:
+    external: true
