@@ -13,7 +13,11 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+  packages: write
 jobs:
   build-test-run:
 
@@ -41,8 +45,24 @@ jobs:
         java-version: '25'
         distribution: 'temurin'
         cache: maven
+    # ------------------------------
+    # Seguridad sobre el código (SAST + Dependency)
+    # ------------------------------
+    - name: Instalando Snyk CLI
+      run: npm install -g snyk
+    - name: Escaneo de dependencias Snyk
+      env:
+        SNYK_TOKEN: ${{ secrets.SNIK_TOKEN }}
+      run: snyk test --all-projects --severity-threshold=medium
     - name: Build con Maven sin Tests
       run: mvn -B -pl producto-service, orden-service -am clean package -DskipTests
+    - name: Escaneo Trivy Filesystem (SAST + config)
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        ignore-unfixed: true
+        severity: 'HIGH, CRITICAL'
     # ----------------------------
     #   Levantar PRODUCTO-SERVICE
     # ----------------------------
@@ -74,3 +94,4 @@ jobs:
         PRODUCTO_SERVICE_URL: http://localhost:8081
         ORDEN_SERVICE_URL: http://localhost:8082
       run: mvn -B test -pl producto-service, orden-service
+    
