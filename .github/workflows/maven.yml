@@ -94,4 +94,25 @@ jobs:
         PRODUCTO_SERVICE_URL: http://localhost:8081
         ORDEN_SERVICE_URL: http://localhost:8082
       run: mvn -B test -pl producto-service,orden-service -am
+    # -----------------------------------
+    # Hardening: OPA/Confttest sobre los Dockerfiles
+    # -----------------------------------
+    - name: Instalando Conftest
+      run: |
+        curl -L https://github.com/open-policy-agent/conftest/releases/download/v0.69.0/conftest_0.69.0_Linux_x86_64.tar.gz \
+        | tar zx
+        sudo mv conftest /usr/local/bin/
+        conftest --version
+    - name: Validando politicas
+      run: |
+        conftest verify --policy policy
+    - name: Debug con parser output de Dockerfiles
+      run: |
+        echo "=== producto-service parseado ==="
+        conftest parse --parser dockerfile producto-service/Dockerfile
+        conftest parse --parser dockerfile orden-service/Dockerfile
+    - name: Check de politicas de seguridad (Dockerfile)
+      run: |
+        conftest test --parser dockerfile producto-service/Dockerfile --output json
+        conftest test --parser dockerfile orden-service/Dockerfile --output json
     
