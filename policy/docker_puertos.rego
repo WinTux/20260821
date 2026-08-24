@@ -5,8 +5,8 @@ import rego.v1
 deny contains msg if {
     some i
     lower(input.dockerfile[0][i].Cmd) == "expose"
-    not puerto-valido(input.dockerfile[0][i].Value)
-    msg := springf("Puerto %v no es valido, solo se permiten valores de 8083 y 8084", [input.dockerfile[0][i].Value])
+    not puerto_valido(input.dockerfile[0][i].Value)
+    msg := stringf("Puerto %v no es valido, solo se permiten valores de 8083 y 8084", [input.dockerfile[0][i].Value])
 }
 
 puerto_valido(p) if {
