@@ -62,7 +62,7 @@ jobs:
         scan-type: 'fs'
         scan-ref: '.'
         ignore-unfixed: true
-        severity: 'HIGH, CRITICAL'
+        severity: 'HIGH,CRITICAL'
     # ----------------------------
     #   Levantar PRODUCTO-SERVICE
     # ----------------------------
