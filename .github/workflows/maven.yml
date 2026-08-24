@@ -52,7 +52,7 @@ jobs:
       run: npm install -g snyk
     - name: Escaneo de dependencias Snyk
       env:
-        SNYK_TOKEN: ${{ secrets.SNIK_TOKEN }}
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       run: snyk test --all-projects --severity-threshold=medium
     - name: Build con Maven sin Tests
       run: mvn -B -pl producto-service, orden-service -am clean package -DskipTests
