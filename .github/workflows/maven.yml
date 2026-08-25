@@ -116,3 +116,20 @@ jobs:
         conftest test --parser dockerfile producto-service/Dockerfile --output json
         conftest test --parser dockerfile orden-service/Dockerfile --output json
     
+    # -----------------------------------
+    # SBOM (Software Bill of Materias)
+    # -----------------------------------
+    - name: SBOM producto-service
+      uses: anchore/sbom-action@v0
+      with:
+        path: producto-service
+        format: json
+        output-file: producto-sbom.json
+        upload-artifact: true
+    - name: SBOM orden-service
+      uses: anchore/sbom-action@v0
+      with:
+        path: orden-service
+        format: json
+        output-file: orden-sbom.json
+        upload-artifact: true
