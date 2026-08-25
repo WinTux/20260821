@@ -168,3 +168,33 @@ jobs:
       with:
         name: archivos-sarif
         path: "*.sarif"
+    # -----------------------------------
+    # Build de imagenes Docker
+    # -----------------------------------
+    - name: Build de imagenes
+      run: |
+        docker build -t producto-service-img --build-arg SERVICE_NAME=producto-service -f producto-service/Dockerfile .
+        docker build -t orden-service-img --build-arg SERVICE_NAME=orden-service -f orden-service/Dockerfile .
+    # -----------------------------------
+    # Escaneo de imagenes con Trivy
+    # -----------------------------------
+    - name: Escaneo con Trivy - producto-service
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        scan-type: image
+        image-ref: 'producto-service-img'
+        severity: 'HIGH,CRITICAL'
+        ignore-unfixed: true
+    - name: Escaneo con Trivy - orden-service
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        scan-type: image
+        image-ref: 'orden-service-img'
+        severity: 'HIGH,CRITICAL'
+        ignore-unfixed: true
+    - name: Cuando se encuentren vulnerabilidades HIGH o CRITICAL 
+      run: |
+        if grep -R "CRITICAL\|HIGH" trivy*; then
+          echo "Se detecttaron vulnerabilidades. El pipeline falla"
+          exit 1
+        fi || true
