@@ -198,3 +198,22 @@ jobs:
           echo "Se detecttaron vulnerabilidades. El pipeline falla"
           exit 1
         fi || true
+    
+    - name: Trivy - escaneo IaC
+      uses: aquasecurity/trivy-action@v0.36.0
+      with:
+        scan-type: 'config'
+        scan-ref: '.'
+        security: 'HIGH,CRITICAL'
+    - name: Lint falco vi adocker
+      run: |
+        docker run --rm \
+        -v ${{ github.workspace }}/rules:/rules \
+        falcosecurity/falco:latest \
+        falco --list -r /rules/springboot-runtime.yaml
+    - name: Validando reglas Falco desde el yaml
+      run: |
+        docker run --rm \
+        -v ${{ github.workspace }}/rules:/rules \
+        falcosecurity/falco:latest \
+        falco --dry-run -r /rules/springboot-runtime.yaml
